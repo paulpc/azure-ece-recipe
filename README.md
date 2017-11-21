@@ -11,8 +11,17 @@ Template shamelessly borrowed from the Azure Github repo https://github.com/Azur
 
 This template allows you to create the minimum viable ECE environment in Azure for a three zone architecture from (https://www.elastic.co/guide/en/cloud-enterprise/current/ece-topology-example3.html).
 
-We will create 6 VMs - 2 per zone and a load balancer between them with rules on port 12443 for management and 9243 for ElasticSearch and Kibana.
+It will create 6 VMs - 2 per zone and a load balancer between them with load balancing rules on port 12443 for management and 9243 for ElasticSearch and Kibana.
 
 This template also deploys a Storage Account, Virtual Network, Public IP address, Availability Set and Network Interfaces.
 
-In this template, we use the resource loops capability to create the network interfaces and virtual machines
+Once the deployment is complete, log in to the first host and start installing ECE (https://www.elastic.co/guide/en/cloud-enterprise/current/ece-installing.html#ece-installing-first).
+*Caveats* here that the install folder is different due to Azure using the /mnt folder, so a modified version of the set up script resides in /opt, so to start the installation, run:
+`/opt/elastic-cloud-enterprise.sh install`
+
+On the other hosts, you can then run:
+`/opt/elastic-cloud-enterprise.sh install --coordinator-host ecenode0 --availability-zone [ece-region-here] --roles-token '[enter_token_here]'`
+where:
+- [ece_region_here] is one of the 3 regions you planned (assuming you want 3 regions). By default, you'll have ece-region-1a (you can just add 1b and 1c)
+- [enter_token_here] is the allocator / coordinator token you get when creating the first host - you can assign the right function in the interface later
+- you might need the ip in stead of the hostname for the coordinator host - it's the first host you installed ECE on.
