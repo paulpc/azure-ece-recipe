@@ -69,8 +69,8 @@ echo deb https://apt.dockerproject.org/repo ubuntu-xenial main | sudo tee /etc/a
 sudo apt-get update
 
 sudo apt-get install -y docker-engine=1.11*
-
-if [ `dpkg -s docker-engine | grep Version` -eq "Version: 1.11.2-0~xenial" ]
+dockerversion=`dpkg -s docker-engine | grep Version | grep 1.11`
+if [ -n "$dockerversion" ]
 then
     echo "[+] docker successfully installed"
     sudo systemctl stop docker
