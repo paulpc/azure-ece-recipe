@@ -4,6 +4,9 @@
 
 mount=`df | grep ecedata`
 
+# assuming the elastic user (the non admin running docker and ece) will be user 1000 (the first one azure will create)
+username=`id -nu 1000`
+
 if [ -z "$mount" ]
 then
     echo "[*] creating the partitions"
@@ -12,7 +15,7 @@ then
     sleep 10
     sudo mkfs.ext4 /dev/sdc1
     sleep 10
-    sudo install -o $USER -g $USER -d -m 700 /ecedata/
+    sudo install -o $username -g $username -d -m 700 /ecedata/
     echo "/dev/sdc1 /ecedata ext4 defaults,nofail 0 2" | sudo tee -a /etc/fstab
 
     sudo systemctl daemon-reload
@@ -25,8 +28,8 @@ fi
 
 if [  -n "$mount" ]
 then
-    sudo install -o $USER -g $USER -d -m 700 /ecedata/docker
-    sudo install -o $USER -g $USER -d -m 700 /ecedata/elastic
+    sudo install -o $username -g $username -d -m 700 /ecedata/docker
+    sudo install -o $username -g $username -d -m 700 /ecedata/elastic
 
     sed s/GRUB_CMDLINE_LINUX\=\"\"/GRUB_CMDLINE_LINUX\=\"cgroup_enable\=memory\ swapaccount\=1\"/ /etc/default/grub | sudo tee /etc/default/grub
     sudo update-grub
@@ -89,7 +92,7 @@ DOCKERSETTINGS
     sudo systemctl daemon-reload
     sudo systemctl restart docker
     sudo systemctl enable docker
-    sudo usermod -aG docker $USER
+    sudo usermod -aG docker $username
     sudo reboot
 else
   echo "[-] unable to install the right version of docker; exiting"
