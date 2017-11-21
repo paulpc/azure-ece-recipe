@@ -23,8 +23,10 @@ then
 
     echo "mounting the partition"
     sudo mount /dev/sdc1
-    mount=`df | grep ecedata`
 fi
+
+# checking if my mountpoint worked
+mount=`df | grep ecedata`
 
 if [  -n "$mount" ]
 then
@@ -59,27 +61,22 @@ net.ipv4.tcp_max_syn_backlog=65536
 net.core.somaxconn=32768
 net.core.netdev_max_backlog=32768
 CLOUDSETTINGS
-else
-    echo "[-] unable to create partition; exiting"
-    exit
-fi
+    sudo apt-get update
+    sudo apt-get install -y linux-generic-lts-xenial xfsprogs
 
-sudo apt-get update
-sudo apt-get install -y linux-generic-lts-xenial xfsprogs
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 58118E89F3A912897C070ADBF76221572C52609D
+    echo deb https://apt.dockerproject.org/repo ubuntu-xenial main | sudo tee /etc/apt/sources.list.d/docker.list
+    sudo apt-get update
 
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv 58118E89F3A912897C070ADBF76221572C52609D
-echo deb https://apt.dockerproject.org/repo ubuntu-xenial main | sudo tee /etc/apt/sources.list.d/docker.list
-sudo apt-get update
-
-sudo apt-get install -y docker-engine=1.11*
-dockerversion=`dpkg -s docker-engine | grep Version | grep 1.11`
-if [ -n "$dockerversion" ]
-then
-    echo "[+] docker successfully installed"
-    sudo systemctl stop docker
-    echo "docker-engine hold" | sudo dpkg --set-selections
-    sudo mkdir /etc/systemd/system/docker.service.d/
-    cat << DOCKERSETTINGS | sudo tee /etc/systemd/system/docker.service.d/docker.conf
+    sudo apt-get install -y docker-engine=1.11*
+    dockerversion=`dpkg -s docker-engine | grep Version | grep 1.11`
+    if [ -n "$dockerversion" ]
+    then
+        echo "[+] docker successfully installed"
+        sudo systemctl stop docker
+        echo "docker-engine hold" | sudo dpkg --set-selections
+        sudo mkdir /etc/systemd/system/docker.service.d/
+        cat << DOCKERSETTINGS | sudo tee /etc/systemd/system/docker.service.d/docker.conf
 [Unit]
 Description=Docker Service
 After=multi-user.target
@@ -89,12 +86,18 @@ Environment="DOCKER_OPTS=-H unix:///run/docker.sock -g /ecedata/docker --storage
 ExecStart=
 ExecStart=/usr/bin/docker daemon \$DOCKER_OPTS
 DOCKERSETTINGS
-    sudo systemctl daemon-reload
-    sudo systemctl restart docker
-    sudo systemctl enable docker
-    sudo usermod -aG docker $username
-    sudo reboot
+        sudo systemctl daemon-reload
+        sudo systemctl restart docker
+        sudo systemctl enable docker
+        sudo usermod -aG docker $username
+        sudo reboot
+    else
+    echo "[-] unable to install the right version of docker; exiting"
+    exit
+    fi
 else
-  echo "[-] unable to install the right version of docker; exiting"
-  exit
+    echo "[-] unable to create partition; exiting"
+    exit
 fi
+
+
