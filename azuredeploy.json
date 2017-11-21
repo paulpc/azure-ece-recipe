@@ -91,7 +91,7 @@
       }
     },
     "_artifactsLocation": {
-      "defaultValue": "https://raw.githubusercontent.com/paulpc/azure-ece-recipe/master/prep-ece-machine.sh",
+      "defaultValue": "https://raw.githubusercontent.com/paulpc/azure-ece-recipe/master/",
       "type": "string",
       "metadata": {
         "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
@@ -443,7 +443,7 @@
         "autoUpgradeMinorVersion": true,
         "settings": {
           "fileUris": [
-            "[concat(parameters('_artifactsLocation'), '/scripts/prep-ece-machine.sh')]"
+            "[concat(parameters('_artifactsLocation'), 'prep-ece-machine.sh')]"
           ],
           "commandToExecute": "[parameters('commandToExecute')]"
         }
