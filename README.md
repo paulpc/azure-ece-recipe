@@ -8,6 +8,7 @@
 </a>
 
 Template shamelessly borrowed from the Azure Github repo https://github.com/Azure/azure-quickstart-templates/tree/master/201-2-vms-loadbalancer-lbrules. Mainained the MIT license for that.
+
 This template allows you to create the minimum viable ECE environment in Azure for a three zone architecture from (https://www.elastic.co/guide/en/cloud-enterprise/current/ece-topology-example3.html).
 
 We will create 6 VMs - 2 per zone and a load balancer between them with rules on port 12443 for management and 9243 for ElasticSearch and Kibana.
