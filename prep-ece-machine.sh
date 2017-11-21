@@ -6,21 +6,21 @@ mount=`df | grep ecedata`
 
 if [ -z "$mount" ]
 then
-echo "[*] creating the partitions"
-sudo parted /dev/sdc mklabel gpt 
-sudo parted /dev/sdc mkpart ecedata ext4 1 100%
-sleep 10
-sudo mkfs.ext4 /dev/sdc1
-sleep 10
-sudo install -o $USER -g $USER -d -m 700 /ecedata/
-echo "/dev/sdc1 /ecedata ext4 defaults,nofail 0 2" | sudo tee -a /etc/fstab
+    echo "[*] creating the partitions"
+    sudo parted /dev/sdc mklabel gpt 
+    sudo parted /dev/sdc mkpart ecedata ext4 1 100%
+    sleep 10
+    sudo mkfs.ext4 /dev/sdc1
+    sleep 10
+    sudo install -o $USER -g $USER -d -m 700 /ecedata/
+    echo "/dev/sdc1 /ecedata ext4 defaults,nofail 0 2" | sudo tee -a /etc/fstab
 
-sudo systemctl daemon-reload
-sudo systemctl restart local-fs.target
+    sudo systemctl daemon-reload
+    sudo systemctl restart local-fs.target
 
-echo "mounting the partition"
-sudo mount /dev/sdc1
-mount=`df | grep ecedata`
+    echo "mounting the partition"
+    sudo mount /dev/sdc1
+    mount=`df | grep ecedata`
 fi
 
 if [  -n "$mount" ]
@@ -84,22 +84,14 @@ After=multi-user.target
 [Service]
 Environment="DOCKER_OPTS=-H unix:///run/docker.sock -g /ecedata/docker --storage-driver=aufs --bip=172.17.42.1/16 --raw-logs"
 ExecStart=
-ExecStart=/usr/bin/docker daemon $DOCKER_OPTS
+ExecStart=/usr/bin/docker daemon \$DOCKER_OPTS
 DOCKERSETTINGS
     sudo systemctl daemon-reload
     sudo systemctl restart docker
     sudo systemctl enable docker
     sudo usermod -aG docker $USER
+    sudo reboot
 else
   echo "[-] unable to install the right version of docker; exiting"
   exit
 fi
-
-
-
-
-
-
-
-
-#sudo reboot
