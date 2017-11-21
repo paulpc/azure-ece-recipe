@@ -2,6 +2,10 @@
 
 # following the tutorial from: https://www.elastic.co/guide/en/cloud-enterprise/current/ece-configure-hosts.html#ece-configure-hosts-xenial
 
+mount=`df | grep ecedata`
+
+if [ -z "$mount" ]
+then
 echo "[*] creating the partitions"
 sudo parted /dev/sdc mklabel gpt 
 sudo parted /dev/sdc mkpart ecedata ext4 1 100%
@@ -16,12 +20,14 @@ sudo systemctl restart local-fs.target
 
 echo "mounting the partition"
 sudo mount /dev/sdc1
+mount=`df | grep ecedata`
+fi
 
-if [ `df | grep ecedata` -gt "" ]
+if [  -n "$mount" ]
 then
     sudo install -o $USER -g $USER -d -m 700 /ecedata/docker
     sudo install -o $USER -g $USER -d -m 700 /ecedata/elastic
-    
+
     sed s/GRUB_CMDLINE_LINUX\=\"\"/GRUB_CMDLINE_LINUX\=\"cgroup_enable\=memory\ swapaccount\=1\"/ /etc/default/grub | sudo tee /etc/default/grub
     sudo update-grub
 
