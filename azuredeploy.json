@@ -99,7 +99,7 @@
     },
     "commandToExecute": {
       "type": "string",
-      "defaultValue":"/bin/bash /scripts/prep-ece-machine.sh",
+      "defaultValue":"./prep-ece-machine.sh",
       "metadata": {
         "description": "The command to execute."
       }

@@ -91,14 +91,15 @@ Environment="DOCKER_OPTS=-H unix:///run/docker.sock -g /ecedata/docker --storage
 ExecStart=
 ExecStart=/usr/bin/docker daemon \$DOCKER_OPTS
 DOCKERSETTINGS
+        sudo usermod -aG docker $username
         # finishing up the daemon config for docker
         sudo systemctl daemon-reload
         sudo systemctl restart docker
         sudo systemctl enable docker
-        sudo usermod -aG docker $username
         # finally, download the ECE image and put it in /opt - you will need to run it manually
         curl -fsSL https://download.elastic.co/cloud/elastic-cloud-enterprise.sh | sed s/mnt.data/ecedata/ | sudo tee /opt/elastic-cloud-enterprise.sh
-        sudo reboot
+        # removing reboots because they confuse the automation script
+        # sudo reboot
     else
     echo "[-] unable to install the right version of docker; exiting"
     exit
